@@ -1,6 +1,6 @@
 import { Document, Page, Text, View, Link } from "@react-pdf/renderer";
 import { createTw } from "react-pdf-tailwind";
-import { ResumeData } from "@/app/store/useResumeStore";
+import { ResumeData } from "@/app/store/useResumeStore"; // Ensure path is correct for your setup
 
 const tw = createTw({
   theme: {
@@ -28,9 +28,8 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
     portfolio,
     socialMedia,
     leadership,
+    visibility,
   } = data;
-
-  // 2. Update the Header Section (Address and Socials)
 
   return (
     <Document>
@@ -56,13 +55,8 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             {/* Map Social Media links next to contact info */}
             {socialMedia &&
               socialMedia.map((social) => {
-                // 1. If both fields are empty while they just clicked "Add", render nothing yet
                 if (!social.platform && !social.url) return null;
-
-                // 2. Fallback text so it never renders invisibly
                 const displayText = social.platform || social.url;
-
-                // 3. React-PDF requires http:// or https:// to work properly
                 const isValidUrl = social.url.length > 0;
                 const formattedUrl = social.url.startsWith("http")
                   ? social.url
@@ -86,7 +80,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         </View>
 
         {/* Education Section */}
-        {education.length > 0 && (
+        {visibility.education && education.length > 0 && (
           <View style={tw("mb-4")}>
             <Text
               style={tw(
@@ -96,7 +90,6 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
               Education
             </Text>
 
-            {/* Map through the education array */}
             {education.map((edu) => (
               <View key={edu.id} style={tw("mb-3")}>
                 <View
@@ -122,8 +115,9 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             ))}
           </View>
         )}
+
         {/* Experience Section */}
-        {experience.length > 0 && (
+        {visibility.experience && experience.length > 0 && (
           <View style={tw("mb-4")}>
             <Text
               style={tw(
@@ -150,10 +144,9 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
                   {exp.company}
                 </Text>
 
-                {/* Magic Bullet Point Generator */}
                 {exp.description &&
                   exp.description.split("\n").map((line, i) => {
-                    if (!line.trim()) return null; // Skip empty lines
+                    if (!line.trim()) return null;
                     return (
                       <View key={i} style={tw("flex flex-row mb-1 pr-4")}>
                         <Text style={tw("text-xs mr-2")}>•</Text>
@@ -169,8 +162,9 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             ))}
           </View>
         )}
+
         {/* Leadership Section */}
-        {leadership && leadership.length > 0 && (
+        {visibility.leadership && leadership && leadership.length > 0 && (
           <View style={tw("mb-4")}>
             <Text
               style={tw(
@@ -197,7 +191,6 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
                   {item.company}
                 </Text>
 
-                {/* Magic Bullet Point Generator */}
                 {item.description &&
                   item.description.split("\n").map((line, i) => {
                     if (!line.trim()) return null; 
@@ -216,7 +209,9 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             ))}
           </View>
         )}
-        {volunteer && volunteer.length > 0 && (
+
+        {/* Volunteer Section */}
+        {visibility.volunteer && volunteer && volunteer.length > 0 && (
           <View style={tw("mb-4")}>
             <Text
               style={tw(
@@ -260,7 +255,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         )}
 
         {/* Skills Section */}
-        {skills && skills.length > 0 && (
+        {visibility.skills && skills && skills.length > 0 && (
           <View style={tw("mb-4")}>
             <Text
               style={tw(
@@ -269,8 +264,6 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             >
               Skills
             </Text>
-
-            {/* Flex container to wrap the skill pills naturally */}
             <View style={tw("flex flex-row flex-wrap gap-2")}>
               {skills.map((skill, index) => (
                 <View
@@ -285,8 +278,9 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             </View>
           </View>
         )}
+
         {/* Projects Section */}
-        {projects && projects.length > 0 && (
+        {visibility.projects && projects && projects.length > 0 && (
           <View style={tw("mb-4")}>
             <Text
               style={tw(
@@ -302,8 +296,6 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
                   <Text style={tw("font-bold text-sm text-gray-900 mr-2")}>
                     {project.name}
                   </Text>
-
-                  {/* The clickable embedded link */}
                   {project.link && (
                     <Link
                       src={project.link}
@@ -313,15 +305,11 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
                     </Link>
                   )}
                 </View>
-
-                {/* Tech Stack */}
                 {project.technologies && (
                   <Text style={tw("text-xs text-gray-600 italic mb-1")}>
                     Technologies: {project.technologies}
                   </Text>
                 )}
-
-                {/* Bullet Points for Description */}
                 {project.description &&
                   project.description.split("\n").map((line, i) => {
                     if (!line.trim()) return null;
@@ -340,8 +328,9 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             ))}
           </View>
         )}
+
         {/* Portfolio Section */}
-        {portfolio && portfolio.length > 0 && (
+        {visibility.portfolio && portfolio && portfolio.length > 0 && (
           <View style={tw("mb-4")}>
             <Text
               style={tw(
@@ -352,13 +341,8 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             </Text>
             <View style={tw("flex flex-row flex-wrap gap-4")}>
               {portfolio.map((item) => {
-                // 1. If both fields are empty, render nothing
                 if (!item.title && !item.link) return null;
-
-                // 2. Fallback text so it never renders invisibly
                 const displayText = item.title || item.link;
-
-                // 3. React-PDF requires http:// or https:// to work properly
                 const isValidUrl = item.link.length > 0;
                 const formattedUrl = item.link.startsWith("http")
                   ? item.link
@@ -381,8 +365,9 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             </View>
           </View>
         )}
+
         {/* Certifications Section */}
-        {certifications && certifications.length > 0 && (
+        {visibility.certifications && certifications && certifications.length > 0 && (
           <View style={tw("mb-4")}>
             <Text
               style={tw(
@@ -418,8 +403,9 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             ))}
           </View>
         )}
+
         {/* Awards Section */}
-        {awards && awards.length > 0 && (
+        {visibility.awards && awards && awards.length > 0 && (
           <View style={tw("mb-4")}>
             <Text
               style={tw(
@@ -446,9 +432,9 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
           </View>
         )}
 
-        {/* Languages & Hobbies Row (Putting them side-by-side to save space on the page) */}
+        {/* Languages & Hobbies Row */}
         <View style={tw("flex flex-row gap-8 mt-4 mb-4")}>
-          {languages && languages.length > 0 && (
+          {visibility.languages && languages && languages.length > 0 && (
             <View style={tw("flex-1")}>
               <Text
                 style={tw(
@@ -472,7 +458,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             </View>
           )}
 
-          {hobbies && hobbies.length > 0 && (
+          {visibility.hobbies && hobbies && hobbies.length > 0 && (
             <View style={tw("flex-1")}>
               <Text
                 style={tw(
@@ -498,7 +484,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         </View>
 
         {/* References Section */}
-        {references && (
+        {visibility.references && references && (
           <View style={tw("mb-4 mt-4")}>
             <Text
               style={tw(

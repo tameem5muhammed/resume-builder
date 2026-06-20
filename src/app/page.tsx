@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import { BuilderLayout } from "@/app/components/templates/BuilderLayout";
 import { PersonalInfoForm } from "@/app/components/organisms/PersonalInfoForm";
-// 1. Import the new form
 import { EducationForm } from "@/app/components/organisms/EducationForm";
 import { ExperienceForm } from "./components/organisms/ExperienceForm";
 import { SkillsForm } from "./components/organisms/SkillForm";
@@ -17,6 +16,9 @@ import { SocialMediaForm } from "./components/organisms/SocialMediaForm";
 import { PortfolioForm } from "./components/organisms/PortfolioForm";
 import { VolunteerForm } from "./components/organisms/VolunteerForm";
 import { LeadershipForm } from "./components/organisms/LeadershipForm";
+import { SectionToggles } from "./components/organisms/SectionToggles";
+// 1. Import the Download Button
+import { DownloadButton } from "./components/organisms/DownloadButton"; 
 
 const ResumePreview = dynamic(
   () => import("@/app/components/organisms/ResumePreview"),
@@ -31,18 +33,25 @@ export default function Home() {
     <BuilderLayout
       forms={
         <>
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-8">
-            Resume Builder
-          </h1>
+          {/* 2. Group the Title and Download Button in a Flex container */}
+          <div className="flex justify-between items-center mb-8 bg-white p-4 rounded-lg shadow-sm border border-gray-100 sticky top-0 z-10">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">
+              Resume Builder
+            </h1>
+            <DownloadButton />
+          </div>
+          
+          <SectionToggles /> 
+          
           <PersonalInfoForm />
-          <SocialMediaForm /> {/* Good to have right after personal info */}
+          <SocialMediaForm />
           <EducationForm />
           <ExperienceForm />
           <LeadershipForm />
-          <VolunteerForm /> {/* Good to have near experience */}
+          <VolunteerForm />
           <SkillsForm />
           <ProjectsForm />
-          <PortfolioForm /> {/* Good to have near projects */}
+          <PortfolioForm />
           <CertificationsForm />
           <AwardsForm />
           <LanguagesForm />

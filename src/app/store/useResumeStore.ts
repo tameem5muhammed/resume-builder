@@ -48,6 +48,21 @@ export interface SocialLink {
   url: string;
 }
 
+export interface VisibilitySettings {
+  education: boolean;
+  experience: boolean;
+  leadership: boolean;
+  volunteer: boolean;
+  projects: boolean;
+  portfolio: boolean;
+  skills: boolean;
+  certifications: boolean;
+  awards: boolean;
+  languages: boolean;
+  hobbies: boolean;
+  references: boolean;
+}
+
 export interface ResumeData {
   personalInfo: {
     name: string;
@@ -70,6 +85,7 @@ export interface ResumeData {
   portfolio: PortfolioItem[];
   socialMedia: SocialLink[];
   references: string;
+  visibility: VisibilitySettings;
 }
 
 interface ResumeStore {
@@ -89,9 +105,17 @@ interface ResumeStore {
   addProject: (project: Project) => void;
   updateProject: (id: string, updatedProject: Partial<Project>) => void;
   removeProject: (id: string) => void;
-  updateList: <K extends 'leadership' | 'volunteer' | 'certifications' | 'awards' | 'portfolio' | 'socialMedia'>(
-    key: K, 
-    items: ResumeData[K]
+  updateList: <
+    K extends
+      | "leadership"
+      | "volunteer"
+      | "certifications"
+      | "awards"
+      | "portfolio"
+      | "socialMedia",
+  >(
+    key: K,
+    items: ResumeData[K],
   ) => void;
 
   updateTags: <K extends "hobbies" | "languages">(
@@ -99,13 +123,20 @@ interface ResumeStore {
     items: ResumeData[K],
   ) => void;
 
-  
   updateReferences: (text: string) => void;
+  toggleVisibility: (section: keyof VisibilitySettings) => void;
 }
 
 export const useResumeStore = create<ResumeStore>((set) => ({
   data: {
-    personalInfo: { name: "", title: "", email: "", phone: "", website: "", address: ""},
+    personalInfo: {
+      name: "",
+      title: "",
+      email: "",
+      phone: "",
+      website: "",
+      address: "",
+    },
     education: [],
     experience: [], // Initialize as empty array
     skills: [],
@@ -119,6 +150,21 @@ export const useResumeStore = create<ResumeStore>((set) => ({
     portfolio: [],
     socialMedia: [],
     references: "Available upon request.", // Default standard text
+
+    visibility: {
+      education: true,
+      experience: true,
+      leadership: true,
+      volunteer: true,
+      projects: true,
+      portfolio: true,
+      skills: true,
+      certifications: true,
+      awards: true,
+      languages: true,
+      hobbies: true,
+      references: true,
+    },
   },
 
   updatePersonalInfo: (info) =>
@@ -215,4 +261,15 @@ export const useResumeStore = create<ResumeStore>((set) => ({
     set((state) => ({ data: { ...state.data, [key]: items } })),
   updateReferences: (text) =>
     set((state) => ({ data: { ...state.data, references: text } })),
+
+  toggleVisibility: (section) =>
+    set((state) => ({
+      data: {
+        ...state.data,
+        visibility: {
+          ...state.data.visibility,
+          [section]: !state.data.visibility[section], // Flips true to false, or false to true
+        },
+      },
+    })),
 }));
