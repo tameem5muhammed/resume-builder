@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  resumes   Resume[] // A user can have multiple resumes
+  createdAt DateTime @default(now())
+}
+
+model Resume {
+  id        String   @id @default(cuid())
+  title     String   // e.g., "Tech Lead Resume v1"
+  content   Json     // Storing the actual resume data as a JSON object
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
