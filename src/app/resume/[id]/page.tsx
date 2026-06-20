@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getResumeById } from "@/app/actions/resumeActions";
-import { PublicDownloadButton } from "@/app/components/organisms/PublicDownloadButton";
+// 1. Updated the import to the new Panel
+import { PublicDownloadPanel } from "@/app/components/organisms/PublicDownloadPanel";
 import { ResumeData } from "@/app/store/useResumeStore";
 
 export default async function PublicResumePage({ params }: { params: Promise<{ id: string }> }) {
@@ -27,7 +28,8 @@ export default async function PublicResumePage({ params }: { params: Promise<{ i
         <p className="text-gray-500 text-sm font-medium">
           You are viewing <span className="font-bold text-gray-900">{personalInfo.name}'s</span> public resume.
         </p>
-        <PublicDownloadButton data={data} />
+        {/* 2. Swapped out the old button for the interactive Panel */}
+        <PublicDownloadPanel data={data} />
       </div>
 
       <main className="max-w-4xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden border border-gray-200">
