@@ -32,12 +32,12 @@ export function LeadershipForm() {
   };
 
   return (
-    <section className="p-6 bg-white rounded-lg shadow-md mt-6">
-      <div className="flex justify-between items-center mb-6 border-b pb-2">
-        <h2 className="text-xl font-bold">Leadership & Extracurriculars</h2>
+    <section className="p-6 bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+      <div className="flex justify-between items-center mb-6 border-b border-gray-800 pb-2">
+        <h2 className="text-xl font-bold text-white">Leadership & Extracurriculars</h2>
         <button 
           onClick={handleAdd} 
-          className="px-4 py-2 bg-gray-900 text-white text-sm rounded-md"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md transition-colors"
         >
           + Add Role
         </button>
@@ -45,10 +45,10 @@ export function LeadershipForm() {
 
       <div className="space-y-6">
         {leadershipList.map((item) => (
-          <div key={item.id} className="p-4 border border-gray-200 rounded-md bg-gray-50 relative">
+          <div key={item.id} className="p-4 border border-gray-700 rounded-md bg-gray-800 relative">
             <button 
               onClick={() => removeItem(item.id)} 
-              className="absolute top-4 right-4 text-red-500 hover:text-red-700 text-sm font-semibold"
+              className="absolute top-4 right-4 text-red-400 hover:text-red-300 text-sm font-semibold transition-colors"
             >
               Remove
             </button>

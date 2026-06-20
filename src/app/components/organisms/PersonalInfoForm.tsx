@@ -17,8 +17,8 @@ export function PersonalInfoForm() {
   };
 
   return (
-    <section className="p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-6 border-b pb-2">
+    <section className="p-6 bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+      <h2 className="text-xl font-bold mb-6 border-b border-gray-800 pb-2 text-white">
         Personal Information
       </h2>
 
@@ -57,7 +57,6 @@ export function PersonalInfoForm() {
           value={personalInfo.phone}
           onChange={handleChange}
         />
-        {/* Inside the grid in PersonalInfoForm */}
         <FormField
           label="Address / Location"
           name="address"

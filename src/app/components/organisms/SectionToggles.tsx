@@ -23,9 +23,9 @@ export function SectionToggles() {
   ] as const;
 
   return (
-    <section className="p-6 bg-white rounded-lg shadow-md mb-6">
-      <h2 className="text-xl font-bold mb-4 border-b pb-2">Visible Sections</h2>
-      <p className="text-sm text-gray-500 mb-6">Toggle which sections appear on your final PDF.</p>
+    <section className="p-6 bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+      <h2 className="text-xl font-bold mb-4 border-b border-gray-800 pb-2 text-white">Visible Sections</h2>
+      <p className="text-sm text-gray-400 mb-6">Toggle which sections appear on your final PDF.</p>
       
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {sections.map(({ key, label }) => (
@@ -35,9 +35,9 @@ export function SectionToggles() {
               type="checkbox"
               checked={visibility[key]}
               onChange={() => toggleVisibility(key)}
-              className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+              className="w-5 h-5 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-offset-gray-800 cursor-pointer"
             />
-            <span className={`text-sm font-medium transition-colors ${visibility[key] ? 'text-gray-900' : 'text-gray-400 line-through'}`}>
+            <span className={`text-sm font-medium transition-colors ${visibility[key] ? 'text-gray-200' : 'text-gray-500 line-through'}`}>
               {label}
             </span>
           </label>

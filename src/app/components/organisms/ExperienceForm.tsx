@@ -23,30 +23,30 @@ export function ExperienceForm() {
   };
 
   return (
-    <section className="p-6 bg-white rounded-lg shadow-md mt-6">
-      <div className="flex justify-between items-center mb-6 border-b pb-2">
-        <h2 className="text-xl font-bold">Professional Experience</h2>
-        <button onClick={handleAdd} className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800">
+    <section className="p-6 bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+      <div className="flex justify-between items-center mb-6 border-b border-gray-800 pb-2">
+        <h2 className="text-xl font-bold text-white">Professional Experience</h2>
+        <button onClick={handleAdd} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors">
           + Add Experience
         </button>
       </div>
 
       {experienceList.length === 0 && (
-        <p className="text-gray-500 text-sm italic">No experience added yet.</p>
+        <p className="text-gray-400 text-sm italic">No experience added yet.</p>
       )}
 
       <div className="space-y-6">
         {experienceList.map((exp, index) => (
-          <div key={exp.id} className="p-4 border border-gray-200 rounded-md bg-gray-50 relative">
+          <div key={exp.id} className="p-4 border border-gray-700 rounded-md bg-gray-800 relative">
             {/* Delete Button */}
             <button 
               onClick={() => removeExperience(exp.id)}
-              className="absolute top-4 right-4 text-red-500 hover:text-red-700 text-sm font-semibold"
+              className="absolute top-4 right-4 text-red-400 hover:text-red-300 text-sm font-semibold transition-colors"
             >
               Remove
             </button>
 
-            <h3 className="font-semibold text-gray-700 mb-4">Role #{index + 1}</h3>
+            <h3 className="font-semibold text-gray-300 mb-4">Role #{index + 1}</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <FormField label="Company / Organization" id={`company-${exp.id}`} placeholder="Tech Corp Inc." value={exp.company} onChange={(e) => updateExperience(exp.id, { company: e.target.value })} />

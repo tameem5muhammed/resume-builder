@@ -10,22 +10,21 @@ export interface Education {
   gpa: string;
 }
 
-// 1. Define the Experience interface
 export interface Experience {
   id: string;
   company: string;
   position: string;
   startDate: string;
   endDate: string;
-  description: string; // This will hold our multi-line "things done"
+  description: string;
 }
 
 export interface Project {
   id: string;
   name: string;
   description: string;
-  link: string; // The embedded URL
-  technologies: string; // e.g., "React, Node.js, Tailwind"
+  link: string;
+  technologies: string;
 }
 
 export interface Certification {
@@ -44,7 +43,7 @@ export interface PortfolioItem {
 
 export interface SocialLink {
   id: string;
-  platform: string; // e.g., "LinkedIn", "GitHub"
+  platform: string;
   url: string;
 }
 
@@ -73,13 +72,13 @@ export interface ResumeData {
     address: string;
   };
   education: Education[];
-  experience: Experience[]; // 2. Add experience array to our data
+  experience: Experience[];
   skills: string[];
   projects: Project[];
-  leadership: Experience[]; // Reusing Experience shape
-  volunteer: Experience[]; // Reusing Experience shape
+  leadership: Experience[];
+  volunteer: Experience[];
   certifications: Certification[];
-  awards: Certification[]; // Reusing Certification shape (name, issuer/giver, date)
+  awards: Certification[];
   hobbies: string[];
   languages: string[];
   portfolio: PortfolioItem[];
@@ -90,13 +89,14 @@ export interface ResumeData {
 
 interface ResumeStore {
   data: ResumeData;
+  currentResumeId: string | null;
+  setCurrentResumeId: (id: string | null) => void;
+  loadFullResume: (resumeId: string, fullData: ResumeData) => void; // Defined here
   updatePersonalInfo: (info: Partial<ResumeData["personalInfo"]>) => void;
-
   addEducation: (edu: Education) => void;
   updateEducation: (id: string, updatedEdu: Partial<Education>) => void;
-  removeEducation: (id: string) => void; // Added remove function
+  removeEducation: (id: string) => void;
 
-  // 3. Add Experience actions
   addExperience: (exp: Experience) => void;
   updateExperience: (id: string, updatedExp: Partial<Experience>) => void;
   removeExperience: (id: string) => void;
@@ -105,6 +105,7 @@ interface ResumeStore {
   addProject: (project: Project) => void;
   updateProject: (id: string, updatedProject: Partial<Project>) => void;
   removeProject: (id: string) => void;
+  
   updateList: <
     K extends
       | "leadership"
@@ -138,7 +139,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       address: "",
     },
     education: [],
-    experience: [], // Initialize as empty array
+    experience: [],
     skills: [],
     projects: [],
     leadership: [],
@@ -149,7 +150,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
     languages: [],
     portfolio: [],
     socialMedia: [],
-    references: "Available upon request.", // Default standard text
+    references: "Available upon request.",
 
     visibility: {
       education: true,
@@ -167,6 +168,16 @@ export const useResumeStore = create<ResumeStore>((set) => ({
     },
   },
 
+  currentResumeId: null,
+  
+  setCurrentResumeId: (id) => set({ currentResumeId: id }),
+
+  // Implementation of loadFullResume added here!
+  loadFullResume: (resumeId, fullData) => set({ 
+    currentResumeId: resumeId, 
+    data: fullData 
+  }),
+
   updatePersonalInfo: (info) =>
     set((state) => ({
       data: {
@@ -179,6 +190,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
     set((state) => ({
       data: { ...state.data, education: [...state.data.education, edu] },
     })),
+  
   updateEducation: (id, updatedEdu) =>
     set((state) => ({
       data: {
@@ -188,6 +200,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         ),
       },
     })),
+  
   removeEducation: (id) =>
     set((state) => ({
       data: {
@@ -196,11 +209,11 @@ export const useResumeStore = create<ResumeStore>((set) => ({
       },
     })),
 
-  // 4. Implement Experience actions
   addExperience: (exp) =>
     set((state) => ({
       data: { ...state.data, experience: [...state.data.experience, exp] },
     })),
+  
   updateExperience: (id, updatedExp) =>
     set((state) => ({
       data: {
@@ -210,6 +223,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         ),
       },
     })),
+  
   removeExperience: (id) =>
     set((state) => ({
       data: {
@@ -220,7 +234,6 @@ export const useResumeStore = create<ResumeStore>((set) => ({
 
   addSkill: (skill) =>
     set((state) => {
-      // Prevent adding empty skills or duplicates
       if (!skill.trim() || state.data.skills.includes(skill.trim()))
         return state;
       return {
@@ -235,10 +248,12 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         skills: state.data.skills.filter((skill) => skill !== skillToRemove),
       },
     })),
+  
   addProject: (project) =>
     set((state) => ({
       data: { ...state.data, projects: [...state.data.projects, project] },
     })),
+  
   updateProject: (id, updatedProject) =>
     set((state) => ({
       data: {
@@ -248,6 +263,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         ),
       },
     })),
+  
   removeProject: (id) =>
     set((state) => ({
       data: {
@@ -255,10 +271,13 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         projects: state.data.projects.filter((proj) => proj.id !== id),
       },
     })),
+  
   updateList: (key, items) =>
     set((state) => ({ data: { ...state.data, [key]: items } })),
+  
   updateTags: (key, items) =>
     set((state) => ({ data: { ...state.data, [key]: items } })),
+  
   updateReferences: (text) =>
     set((state) => ({ data: { ...state.data, references: text } })),
 
@@ -268,7 +287,7 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         ...state.data,
         visibility: {
           ...state.data.visibility,
-          [section]: !state.data.visibility[section], // Flips true to false, or false to true
+          [section]: !state.data.visibility[section], 
         },
       },
     })),

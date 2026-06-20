@@ -1,5 +1,7 @@
 "use client";
 
+// 1. Import `use` from React
+import { useEffect, useState, use } from "react";
 import dynamic from "next/dynamic";
 import { BuilderLayout } from "@/app/components/templates/BuilderLayout";
 import { PersonalInfoForm } from "@/app/components/organisms/PersonalInfoForm";
@@ -17,8 +19,10 @@ import { PortfolioForm } from "./components/organisms/PortfolioForm";
 import { VolunteerForm } from "./components/organisms/VolunteerForm";
 import { LeadershipForm } from "./components/organisms/LeadershipForm";
 import { SectionToggles } from "./components/organisms/SectionToggles";
-// 1. Import the Download Button
-import { DownloadButton } from "./components/organisms/DownloadButton"; 
+import { DownloadButton } from "./components/organisms/DownloadButton";
+import { SaveButton } from "./components/organisms/SaveButton"; 
+import { getResumeById } from "@/app/actions/resumeActions";
+import { useResumeStore } from "@/app/store/useResumeStore";
 
 const ResumePreview = dynamic(
   () => import("@/app/components/organisms/ResumePreview"),
@@ -28,17 +32,53 @@ const ResumePreview = dynamic(
   },
 );
 
-export default function Home() {
+// 2. Change searchParams type to a Promise
+export default function Home({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
+  // 3. Unwrap the searchParams using React.use()
+  const params = use(searchParams);
+  const resumeId = params?.id;
+
+  const loadFullResume = useResumeStore((state) => state.loadFullResume);
+  
+  // 4. Use the unwrapped resumeId instead of searchParams
+  const [isLoading, setIsLoading] = useState(!!resumeId);
+
+  useEffect(() => {
+    async function fetchSavedData() {
+      if (resumeId) {
+        const resume = await getResumeById(resumeId);
+        if (resume && resume.content) {
+          const content = typeof resume.content === "string" ? JSON.parse(resume.content) : resume.content;
+          loadFullResume(resume.id, content);
+        }
+      }
+      setIsLoading(false); 
+    }
+    
+    fetchSavedData();
+  }, [resumeId, loadFullResume]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-gray-950 text-white">
+        <p className="text-xl font-bold animate-pulse">Loading your resume...</p>
+      </div>
+    );
+  }
+
   return (
     <BuilderLayout
       forms={
         <>
-          {/* 2. Group the Title and Download Button in a Flex container */}
-          <div className="flex justify-between items-center mb-8 bg-white p-4 rounded-lg shadow-sm border border-gray-100 sticky top-0 z-10">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">
+          <div className="flex justify-between items-center mb-8 bg-gray-900 p-4 rounded-lg shadow-sm border border-gray-800 sticky top-0 z-10">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-white">
               Resume Builder
             </h1>
-            <DownloadButton />
+            
+            <div className="flex items-center gap-4">
+              <SaveButton />
+              <DownloadButton />
+            </div>
           </div>
           
           <SectionToggles /> 

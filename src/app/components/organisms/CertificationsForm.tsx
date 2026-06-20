@@ -22,18 +22,18 @@ export function CertificationsForm() {
   };
 
   return (
-    <section className="p-6 bg-white rounded-lg shadow-md mt-6">
-      <div className="flex justify-between items-center mb-6 border-b pb-2">
-        <h2 className="text-xl font-bold">Certifications</h2>
-        <button onClick={handleAdd} className="px-4 py-2 bg-gray-900 text-white text-sm rounded-md">
+    <section className="p-6 bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+      <div className="flex justify-between items-center mb-6 border-b border-gray-800 pb-2">
+        <h2 className="text-xl font-bold text-white">Certifications</h2>
+        <button onClick={handleAdd} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md transition-colors">
           + Add Certification
         </button>
       </div>
 
       <div className="space-y-6">
         {certifications.map((cert) => (
-          <div key={cert.id} className="p-4 border border-gray-200 rounded-md bg-gray-50 relative">
-            <button onClick={() => handleRemove(cert.id)} className="absolute top-4 right-4 text-red-500 text-sm">Remove</button>
+          <div key={cert.id} className="p-4 border border-gray-700 rounded-md bg-gray-800 relative">
+            <button onClick={() => handleRemove(cert.id)} className="absolute top-4 right-4 text-red-400 hover:text-red-300 text-sm transition-colors">Remove</button>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField label="Certification Name" id={`name-${cert.id}`} value={cert.name} onChange={(e) => handleChange(cert.id, 'name', e.target.value)} />
               <FormField label="Issuing Organization" id={`issuer-${cert.id}`} value={cert.issuer} onChange={(e) => handleChange(cert.id, 'issuer', e.target.value)} />

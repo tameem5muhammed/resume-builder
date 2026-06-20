@@ -22,8 +22,8 @@ export function SkillsForm() {
   };
 
   return (
-    <section className="p-6 bg-white rounded-lg shadow-md mt-6">
-      <h2 className="text-xl font-bold mb-6 border-b pb-2">Skills</h2>
+    <section className="p-6 bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+      <h2 className="text-xl font-bold mb-6 border-b border-gray-800 pb-2 text-white">Skills</h2>
       
       <form onSubmit={handleAdd} className="flex gap-2 mb-6">
         <div className="flex-1">
@@ -37,7 +37,7 @@ export function SkillsForm() {
         </div>
         <button 
           type="submit"
-          className="mt-6 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors h-[42px]"
+          className="mt-6 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors h-[42px]"
         >
           Add
         </button>
@@ -46,17 +46,17 @@ export function SkillsForm() {
       {/* Render the skill tags */}
       <div className="flex flex-wrap gap-2">
         {skills.length === 0 && (
-          <p className="text-gray-500 text-sm italic">No skills added yet.</p>
+          <p className="text-gray-400 text-sm italic">No skills added yet.</p>
         )}
         {skills.map((skill) => (
           <div 
             key={skill} 
-            className="flex items-center gap-2 px-3 py-1 bg-gray-100 border border-gray-300 rounded-full text-sm text-gray-800"
+            className="flex items-center gap-2 px-3 py-1 bg-gray-700 border border-gray-600 rounded-full text-sm text-gray-200"
           >
             <span>{skill}</span>
             <button 
               onClick={() => removeSkill(skill)}
-              className="text-gray-500 hover:text-red-500 font-bold focus:outline-none"
+              className="text-gray-400 hover:text-red-400 font-bold focus:outline-none transition-colors"
               aria-label={`Remove ${skill}`}
             >
               ×

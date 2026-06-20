@@ -22,12 +22,12 @@ export function SocialMediaForm() {
   };
 
   return (
-    <section className="p-6 bg-white rounded-lg shadow-md mt-6">
-      <div className="flex justify-between items-center mb-6 border-b pb-2">
-        <h2 className="text-xl font-bold">Social Media Profiles</h2>
+    <section className="p-6 bg-gray-900 rounded-lg shadow-lg border border-gray-800">
+      <div className="flex justify-between items-center mb-6 border-b border-gray-800 pb-2">
+        <h2 className="text-xl font-bold text-white">Social Media Profiles</h2>
         <button 
           onClick={handleAdd} 
-          className="px-4 py-2 bg-gray-900 text-white text-sm rounded-md"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md transition-colors"
         >
           + Add Profile
         </button>
@@ -35,7 +35,7 @@ export function SocialMediaForm() {
 
       <div className="space-y-4">
         {socialMedia.map((item) => (
-          <div key={item.id} className="grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-4 items-end bg-gray-50 p-4 border rounded-md">
+          <div key={item.id} className="grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-4 items-end bg-gray-800 p-4 border border-gray-700 rounded-md">
             <FormField 
               label="Platform (e.g., LinkedIn)" 
               id={`platform-${item.id}`} 
@@ -51,7 +51,7 @@ export function SocialMediaForm() {
             />
             <button 
               onClick={() => updateList('socialMedia', socialMedia.filter(p => p.id !== item.id))} 
-              className="mb-4 px-3 py-2 text-red-500 hover:bg-red-50 rounded font-semibold"
+              className="mb-4 px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded font-semibold transition-colors"
             >
               Remove
             </button>
