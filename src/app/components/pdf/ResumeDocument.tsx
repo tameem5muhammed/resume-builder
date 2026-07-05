@@ -1,6 +1,6 @@
 import { Document, Page, Text, View, Link } from "@react-pdf/renderer";
 import { createTw } from "react-pdf-tailwind";
-import { ResumeData } from "@/app/store/useResumeStore"; // Ensure path is correct for your setup
+import { ResumeData } from "@/app/store/useResumeStore";
 
 const tw = createTw({
   theme: {
@@ -33,19 +33,25 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
 
   return (
     <Document>
-      <Page size="A4" style={tw("p-8 bg-white")}>
+      <Page
+        size="A4"
+        style={[tw("p-6 bg-white"), { fontFamily: "Times-Roman", fontSize: 12 }]}
+      >
         {/* Header Section: Personal Info */}
-        <View style={tw("border-b border-gray-300 pb-4 mb-4")}>
-          <Text style={tw("text-2xl font-bold text-gray-900")}>
-            {personalInfo.name || "Your Name"}
+        <View style={tw("pb-3 mb-4")}>
+          <Text style={tw("font-bold uppercase text-center")}>
+            {personalInfo.name || "YOUR NAME"}
           </Text>
-          <Text style={tw("text-base text-gray-600 mt-1")}>
-            {personalInfo.title || "Professional Title"}
-          </Text>
+          
+          {personalInfo.title && (
+            <Text style={tw("font-bold uppercase text-center mt-1")}>
+              {personalInfo.title}
+            </Text>
+          )}
 
           <View
             style={tw(
-              "flex flex-row flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500",
+              "flex flex-row flex-wrap justify-center gap-x-3 gap-y-1 mt-2",
             )}
           >
             {personalInfo.email && <Text>{personalInfo.email}</Text>}
@@ -66,14 +72,12 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
                   <Link
                     key={social.id}
                     src={formattedUrl}
-                    style={tw("text-blue-600")}
+                    style={tw("text-blue-600 underline")}
                   >
                     {displayText}
                   </Link>
                 ) : (
-                  <Text key={social.id} style={tw("text-gray-600")}>
-                    {displayText}
-                  </Text>
+                  <Text key={social.id}>{displayText}</Text>
                 );
               })}
           </View>
@@ -82,35 +86,23 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         {/* Education Section */}
         {visibility.education && education.length > 0 && (
           <View style={tw("mb-4")}>
-            <Text
-              style={tw(
-                "text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-2",
-              )}
-            >
+            <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               Education
             </Text>
 
             {education.map((edu) => (
-              <View key={edu.id} style={tw("mb-3")}>
-                <View
-                  style={tw("flex flex-row justify-between items-baseline")}
-                >
-                  <Text style={tw("font-bold text-sm text-gray-900")}>
-                    {edu.school}
-                  </Text>
-                  <Text style={tw("text-xs text-gray-600")}>
+              <View key={edu.id} style={tw("mb-2")}>
+                <View style={tw("flex flex-row justify-between items-baseline mb-0.5")}>
+                  <Text style={tw("font-bold")}>{edu.school}</Text>
+                  <Text>
                     {edu.startDate} {edu.startDate && edu.endDate ? "-" : ""}{" "}
                     {edu.endDate}
                   </Text>
                 </View>
-                <Text style={tw("text-sm text-gray-700 mt-1")}>
-                  {edu.major}
-                </Text>
-                {edu.gpa && (
-                  <Text style={tw("text-xs text-gray-500 mt-1")}>
-                    GPA: {edu.gpa}
-                  </Text>
-                )}
+                <View style={tw("flex flex-row justify-between items-baseline")}>
+                  <Text>{edu.major}</Text>
+                  {edu.gpa && <Text>GPA: {edu.gpa}</Text>}
+                </View>
               </View>
             ))}
           </View>
@@ -119,42 +111,28 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         {/* Experience Section */}
         {visibility.experience && experience.length > 0 && (
           <View style={tw("mb-4")}>
-            <Text
-              style={tw(
-                "text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-2 mt-4",
-              )}
-            >
+            <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               Professional Experience
             </Text>
 
             {experience.map((exp) => (
-              <View key={exp.id} style={tw("mb-4")}>
-                <View
-                  style={tw("flex flex-row justify-between items-baseline")}
-                >
-                  <Text style={tw("font-bold text-sm text-gray-900")}>
-                    {exp.position}
-                  </Text>
-                  <Text style={tw("text-xs text-gray-600")}>
+              <View key={exp.id} style={tw("mb-3")}>
+                <View style={tw("flex flex-row justify-between items-baseline mb-0.5")}>
+                  <Text style={tw("font-bold")}>{exp.position}</Text>
+                  <Text>
                     {exp.startDate} {exp.startDate && exp.endDate ? "-" : ""}{" "}
                     {exp.endDate}
                   </Text>
                 </View>
-                <Text style={tw("text-sm text-gray-700 italic mt-1 mb-1")}>
-                  {exp.company}
-                </Text>
+                <Text style={tw("italic mb-1")}>{exp.company}</Text>
 
                 {exp.description &&
                   exp.description.split("\n").map((line, i) => {
                     if (!line.trim()) return null;
                     return (
-                      <View key={i} style={tw("flex flex-row mb-1 pr-4")}>
-                        <Text style={tw("text-xs mr-2")}>•</Text>
-                        <Text
-                          style={tw("text-xs text-gray-700 leading-relaxed")}
-                        >
-                          {line}
-                        </Text>
+                      <View key={i} style={tw("flex flex-row pr-4 mb-0.5")}>
+                        <Text style={tw("mr-1.5")}>•</Text>
+                        <Text>{line}</Text>
                       </View>
                     );
                   })}
@@ -166,42 +144,28 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         {/* Leadership Section */}
         {visibility.leadership && leadership && leadership.length > 0 && (
           <View style={tw("mb-4")}>
-            <Text
-              style={tw(
-                "text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-2 mt-4",
-              )}
-            >
+            <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               Leadership & Extracurricular Activities
             </Text>
 
             {leadership.map((item) => (
-              <View key={item.id} style={tw("mb-4")}>
-                <View
-                  style={tw("flex flex-row justify-between items-baseline")}
-                >
-                  <Text style={tw("font-bold text-sm text-gray-900")}>
-                    {item.position}
-                  </Text>
-                  <Text style={tw("text-xs text-gray-600")}>
+              <View key={item.id} style={tw("mb-3")}>
+                <View style={tw("flex flex-row justify-between items-baseline mb-0.5")}>
+                  <Text style={tw("font-bold")}>{item.position}</Text>
+                  <Text>
                     {item.startDate} {item.startDate && item.endDate ? "-" : ""}{" "}
                     {item.endDate}
                   </Text>
                 </View>
-                <Text style={tw("text-sm text-gray-700 italic mt-1 mb-1")}>
-                  {item.company}
-                </Text>
+                <Text style={tw("italic mb-1")}>{item.company}</Text>
 
                 {item.description &&
                   item.description.split("\n").map((line, i) => {
-                    if (!line.trim()) return null; 
+                    if (!line.trim()) return null;
                     return (
-                      <View key={i} style={tw("flex flex-row mb-1 pr-4")}>
-                        <Text style={tw("text-xs mr-2")}>•</Text>
-                        <Text
-                          style={tw("text-xs text-gray-700 leading-relaxed")}
-                        >
-                          {line}
-                        </Text>
+                      <View key={i} style={tw("flex flex-row pr-4 mb-0.5")}>
+                        <Text style={tw("mr-1.5")}>•</Text>
+                        <Text>{line}</Text>
                       </View>
                     );
                   })}
@@ -213,39 +177,25 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         {/* Volunteer Section */}
         {visibility.volunteer && volunteer && volunteer.length > 0 && (
           <View style={tw("mb-4")}>
-            <Text
-              style={tw(
-                "text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-2 mt-4",
-              )}
-            >
+            <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               Volunteer & Community Service
             </Text>
             {volunteer.map((vol) => (
-              <View key={vol.id} style={tw("mb-4")}>
-                <View
-                  style={tw("flex flex-row justify-between items-baseline")}
-                >
-                  <Text style={tw("font-bold text-sm text-gray-900")}>
-                    {vol.position}
-                  </Text>
-                  <Text style={tw("text-xs text-gray-600")}>
+              <View key={vol.id} style={tw("mb-3")}>
+                <View style={tw("flex flex-row justify-between items-baseline mb-0.5")}>
+                  <Text style={tw("font-bold")}>{vol.position}</Text>
+                  <Text>
                     {vol.startDate} - {vol.endDate}
                   </Text>
                 </View>
-                <Text style={tw("text-sm text-gray-700 italic mt-1 mb-1")}>
-                  {vol.company}
-                </Text>
+                <Text style={tw("italic mb-1")}>{vol.company}</Text>
                 {vol.description &&
                   vol.description.split("\n").map((line, i) => {
                     if (!line.trim()) return null;
                     return (
-                      <View key={i} style={tw("flex flex-row mb-1 pr-4")}>
-                        <Text style={tw("text-xs mr-2")}>•</Text>
-                        <Text
-                          style={tw("text-xs text-gray-700 leading-relaxed")}
-                        >
-                          {line}
-                        </Text>
+                      <View key={i} style={tw("flex flex-row pr-4 mb-0.5")}>
+                        <Text style={tw("mr-1.5")}>•</Text>
+                        <Text>{line}</Text>
                       </View>
                     );
                   })}
@@ -257,24 +207,11 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         {/* Skills Section */}
         {visibility.skills && skills && skills.length > 0 && (
           <View style={tw("mb-4")}>
-            <Text
-              style={tw(
-                "text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-3 mt-4",
-              )}
-            >
+            <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               Skills
             </Text>
-            <View style={tw("flex flex-row flex-wrap gap-2")}>
-              {skills.map((skill, index) => (
-                <View
-                  key={index}
-                  style={tw(
-                    "px-2 py-1 bg-gray-100 rounded-sm border border-gray-200",
-                  )}
-                >
-                  <Text style={tw("text-xs text-gray-700")}>{skill}</Text>
-                </View>
-              ))}
+            <View style={tw("flex flex-row flex-wrap")}>
+              <Text>{skills.join(", ")}</Text>
             </View>
           </View>
         )}
@@ -282,31 +219,22 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         {/* Projects Section */}
         {visibility.projects && projects && projects.length > 0 && (
           <View style={tw("mb-4")}>
-            <Text
-              style={tw(
-                "text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-2 mt-4",
-              )}
-            >
+            <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               Projects
             </Text>
 
             {projects.map((project) => (
-              <View key={project.id} style={tw("mb-4")}>
+              <View key={project.id} style={tw("mb-3")}>
                 <View style={tw("flex flex-row items-baseline mb-1")}>
-                  <Text style={tw("font-bold text-sm text-gray-900 mr-2")}>
-                    {project.name}
-                  </Text>
+                  <Text style={tw("font-bold mr-1")}>{project.name}</Text>
                   {project.link && (
-                    <Link
-                      src={project.link}
-                      style={tw("text-xs text-blue-600 underline")}
-                    >
-                      View Project
+                    <Link src={project.link} style={tw("text-blue-600 underline")}>
+                      (View Project)
                     </Link>
                   )}
                 </View>
                 {project.technologies && (
-                  <Text style={tw("text-xs text-gray-600 italic mb-1")}>
+                  <Text style={tw("italic mb-1")}>
                     Technologies: {project.technologies}
                   </Text>
                 )}
@@ -314,13 +242,9 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
                   project.description.split("\n").map((line, i) => {
                     if (!line.trim()) return null;
                     return (
-                      <View key={i} style={tw("flex flex-row mb-1 pr-4")}>
-                        <Text style={tw("text-xs mr-2")}>•</Text>
-                        <Text
-                          style={tw("text-xs text-gray-700 leading-relaxed")}
-                        >
-                          {line}
-                        </Text>
+                      <View key={i} style={tw("flex flex-row pr-4 mb-0.5")}>
+                        <Text style={tw("mr-1.5")}>•</Text>
+                        <Text>{line}</Text>
                       </View>
                     );
                   })}
@@ -332,14 +256,10 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         {/* Portfolio Section */}
         {visibility.portfolio && portfolio && portfolio.length > 0 && (
           <View style={tw("mb-4")}>
-            <Text
-              style={tw(
-                "text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-2 mt-4",
-              )}
-            >
+            <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               Portfolio & Profiles
             </Text>
-            <View style={tw("flex flex-row flex-wrap gap-4")}>
+            <View style={tw("flex flex-row flex-wrap gap-x-4")}>
               {portfolio.map((item) => {
                 if (!item.title && !item.link) return null;
                 const displayText = item.title || item.link;
@@ -352,14 +272,12 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
                   <Link
                     key={item.id}
                     src={formattedUrl}
-                    style={tw("text-sm text-blue-600 underline")}
+                    style={tw("text-blue-600 underline")}
                   >
                     {displayText}
                   </Link>
                 ) : (
-                  <Text key={item.id} style={tw("text-sm text-gray-600")}>
-                    {displayText}
-                  </Text>
+                  <Text key={item.id}>{displayText}</Text>
                 );
               })}
             </View>
@@ -369,33 +287,20 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         {/* Certifications Section */}
         {visibility.certifications && certifications && certifications.length > 0 && (
           <View style={tw("mb-4")}>
-            <Text
-              style={tw(
-                "text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-2 mt-4",
-              )}
-            >
+            <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               Certifications
             </Text>
             {certifications.map((cert) => (
               <View key={cert.id} style={tw("mb-2")}>
-                <View
-                  style={tw("flex flex-row justify-between items-baseline")}
-                >
-                  <Text style={tw("font-bold text-sm text-gray-900")}>
-                    {cert.name}
-                  </Text>
-                  <Text style={tw("text-xs text-gray-600")}>{cert.date}</Text>
+                <View style={tw("flex flex-row justify-between items-baseline mb-0.5")}>
+                  <Text style={tw("font-bold")}>{cert.name}</Text>
+                  <Text>{cert.date}</Text>
                 </View>
-                <View style={tw("flex flex-row items-baseline mt-1")}>
-                  <Text style={tw("text-sm text-gray-700 italic mr-2")}>
-                    {cert.issuer}
-                  </Text>
+                <View style={tw("flex flex-row items-baseline")}>
+                  <Text style={tw("italic mr-1")}>{cert.issuer}</Text>
                   {cert.link && (
-                    <Link
-                      src={cert.link}
-                      style={tw("text-xs text-blue-600 underline")}
-                    >
-                      View Credential
+                    <Link src={cert.link} style={tw("text-blue-600 underline")}>
+                      (View Credential)
                     </Link>
                   )}
                 </View>
@@ -407,93 +312,53 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         {/* Awards Section */}
         {visibility.awards && awards && awards.length > 0 && (
           <View style={tw("mb-4")}>
-            <Text
-              style={tw(
-                "text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-2 mt-4",
-              )}
-            >
+            <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               Awards & Achievements
             </Text>
             {awards.map((award) => (
               <View key={award.id} style={tw("mb-2")}>
-                <View
-                  style={tw("flex flex-row justify-between items-baseline")}
-                >
-                  <Text style={tw("font-bold text-sm text-gray-900")}>
-                    {award.name}
-                  </Text>
-                  <Text style={tw("text-xs text-gray-600")}>{award.date}</Text>
+                <View style={tw("flex flex-row justify-between items-baseline mb-0.5")}>
+                  <Text style={tw("font-bold")}>{award.name}</Text>
+                  <Text>{award.date}</Text>
                 </View>
-                <Text style={tw("text-sm text-gray-700 italic mt-1")}>
-                  {award.issuer}
-                </Text>
+                <Text style={tw("italic")}>{award.issuer}</Text>
               </View>
             ))}
           </View>
         )}
 
         {/* Languages & Hobbies Row */}
-        <View style={tw("flex flex-row gap-8 mt-4 mb-4")}>
+        <View style={tw("flex flex-row gap-8 mb-4")}>
           {visibility.languages && languages && languages.length > 0 && (
             <View style={tw("flex-1")}>
-              <Text
-                style={tw(
-                  "text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-3",
-                )}
-              >
+              <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
                 Languages
               </Text>
-              <View style={tw("flex flex-row flex-wrap gap-2")}>
-                {languages.map((lang, index) => (
-                  <Text
-                    key={index}
-                    style={tw(
-                      "text-sm text-gray-700 bg-gray-100 px-2 py-1 rounded-sm border border-gray-200",
-                    )}
-                  >
-                    {lang}
-                  </Text>
-                ))}
+              <View style={tw("flex flex-row flex-wrap")}>
+                <Text>{languages.join(", ")}</Text>
               </View>
             </View>
           )}
 
           {visibility.hobbies && hobbies && hobbies.length > 0 && (
             <View style={tw("flex-1")}>
-              <Text
-                style={tw(
-                  "text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-3",
-                )}
-              >
+              <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
                 Hobbies
               </Text>
-              <View style={tw("flex flex-row flex-wrap gap-2")}>
-                {hobbies.map((hobby, index) => (
-                  <Text
-                    key={index}
-                    style={tw(
-                      "text-sm text-gray-700 bg-gray-100 px-2 py-1 rounded-sm border border-gray-200",
-                    )}
-                  >
-                    {hobby}
-                  </Text>
-                ))}
+              <View style={tw("flex flex-row flex-wrap")}>
+                <Text>{hobbies.join(", ")}</Text>
               </View>
             </View>
           )}
         </View>
 
         {/* References Section */}
-        {visibility.references && references && (
-          <View style={tw("mb-4 mt-4")}>
-            <Text
-              style={tw(
-                "text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-2",
-              )}
-            >
+        {visibility.references && (
+          <View style={tw("mb-4")}>
+            <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               References
             </Text>
-            <Text style={tw("text-sm text-gray-700")}>{references}</Text>
+            <Text>{references}</Text>
           </View>
         )}
       </Page>
