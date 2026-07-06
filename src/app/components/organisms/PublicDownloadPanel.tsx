@@ -18,6 +18,7 @@ export function PublicDownloadPanel({ data }: { data: ResumeData }) {
 
   // Helper array to generate the switches cleanly
   const sections: { key: keyof VisibilitySettings; label: string }[] = [
+    { key: 'summary', label: 'Summary' },
     { key: 'education', label: 'Education' },
     { key: 'experience', label: 'Experience' },
     { key: 'leadership', label: 'Leadership' },
@@ -30,6 +31,7 @@ export function PublicDownloadPanel({ data }: { data: ResumeData }) {
     { key: 'languages', label: 'Languages' },
     { key: 'hobbies', label: 'Hobbies' },
     { key: 'references', label: 'References' },
+    { key: 'footer', label: 'Footer' },
   ];
 
   const handleToggle = (key: keyof VisibilitySettings) => {

@@ -2,40 +2,50 @@
 
 import { prisma } from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
-
-// We will hardcode a "dummy user" ID for now until you add real authentication (like NextAuth or Clerk)
-const DUMMY_USER_ID = "user_123";
+import { getServerSession } from "next-auth";
 
 // 1. Save or Update a Resume
 export async function saveResume(title: string, content: any, resumeId?: string) {
   try {
-    // Ensure the dummy user exists in the DB first
-    await prisma.user.upsert({
-      where: { id: DUMMY_USER_ID },
-      update: {},
-      create: { id: DUMMY_USER_ID, email: "test@example.com", name: "Test User" }
+    const session = await getServerSession();
+    
+    if (!session || !session.user?.email) {
+      return { success: false, error: "Must be logged in to save to cloud." };
+    }
+
+    // Find the user by their authenticated email
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email }
     });
+
+    if (!user) {
+      return { success: false, error: "User not found." };
+    }
+
+    let savedResume;
 
     if (resumeId) {
       // Update existing resume
-      await prisma.resume.update({
+      savedResume = await prisma.resume.update({
         where: { id: resumeId },
         data: { title, content },
       });
     } else {
       // Create new resume
-      await prisma.resume.create({
+      savedResume = await prisma.resume.create({
         data: {
           title,
           content,
-          userId: DUMMY_USER_ID,
+          userId: user.id,
         },
       });
     }
     
     // Tell Next.js to refresh the dashboard page so the new resume shows up
     revalidatePath("/dashboard");
-    return { success: true };
+    
+    // Return the ID so Zustand can update its currentResumeId state
+    return { success: true, newId: savedResume.id };
   } catch (error) {
     console.error("Failed to save resume:", error);
     return { success: false, error: "Failed to save to database" };
@@ -45,8 +55,17 @@ export async function saveResume(title: string, content: any, resumeId?: string)
 // 2. Fetch all Resumes for the Dashboard
 export async function getResumes() {
   try {
+    const session = await getServerSession();
+    if (!session || !session.user?.email) return [];
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email }
+    });
+
+    if (!user) return [];
+
     const resumes = await prisma.resume.findMany({
-      where: { userId: DUMMY_USER_ID },
+      where: { userId: user.id },
       orderBy: { updatedAt: 'desc' },
       select: { id: true, title: true, updatedAt: true } // Don't fetch the massive content JSON just for the list
     });
@@ -60,9 +79,13 @@ export async function getResumes() {
 // 3. Delete a Resume
 export async function deleteResume(id: string) {
   try {
+    const session = await getServerSession();
+    if (!session || !session.user?.email) return { success: false };
+
     await prisma.resume.delete({
       where: { id },
     });
+    
     revalidatePath("/dashboard");
     return { success: true };
   } catch (error) {
@@ -71,6 +94,7 @@ export async function deleteResume(id: string) {
   }
 }
 
+// 4. Get a specific Resume
 export async function getResumeById(id: string) {
   try {
     const resume = await prisma.resume.findUnique({ where: { id } });

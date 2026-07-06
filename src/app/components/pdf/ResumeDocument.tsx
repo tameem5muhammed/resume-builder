@@ -15,6 +15,7 @@ interface ResumeDocumentProps {
 export function ResumeDocument({ data }: ResumeDocumentProps) {
   const {
     personalInfo,
+    summary,
     education,
     experience,
     projects,
@@ -28,6 +29,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
     portfolio,
     socialMedia,
     leadership,
+    footer,
     visibility,
   } = data;
 
@@ -35,7 +37,10 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
     <Document>
       <Page
         size="A4"
-        style={[tw("p-6 bg-white"), { fontFamily: "Times-Roman", fontSize: 12 }]}
+        style={[
+          tw("p-6 bg-white"), 
+          { fontFamily: "Times-Roman", fontSize: 12, paddingBottom: 60 } // Added paddingBottom to make room for the footer
+        ]}
       >
         {/* Header Section: Personal Info */}
         <View style={tw("pb-3 mb-4")}>
@@ -49,39 +54,57 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             </Text>
           )}
 
-          <View
-            style={tw(
-              "flex flex-row flex-wrap justify-center gap-x-3 gap-y-1 mt-2",
+          <View style={tw("flex flex-col items-center mt-2 gap-y-1")}>
+            {(personalInfo.email || personalInfo.phone) && (
+              <View style={tw("flex flex-row items-center gap-x-2")}>
+                {personalInfo.email && <Text>{personalInfo.email}</Text>}
+                {personalInfo.email && personalInfo.phone && <Text>|</Text>}
+                {personalInfo.phone && <Text>{personalInfo.phone}</Text>}
+              </View>
             )}
-          >
-            {personalInfo.email && <Text>{personalInfo.email}</Text>}
-            {personalInfo.phone && <Text>{personalInfo.phone}</Text>}
-            {personalInfo.address && <Text>{personalInfo.address}</Text>}
 
-            {/* Map Social Media links next to contact info */}
-            {socialMedia &&
-              socialMedia.map((social) => {
-                if (!social.platform && !social.url) return null;
-                const displayText = social.platform || social.url;
-                const isValidUrl = social.url.length > 0;
-                const formattedUrl = social.url.startsWith("http")
-                  ? social.url
-                  : `https://${social.url}`;
+            {personalInfo.address && (
+              <View style={tw("flex flex-row")}>
+                <Text>{personalInfo.address}</Text>
+              </View>
+            )}
 
-                return isValidUrl ? (
-                  <Link
-                    key={social.id}
-                    src={formattedUrl}
-                    style={tw("text-blue-600 underline")}
-                  >
-                    {displayText}
-                  </Link>
-                ) : (
-                  <Text key={social.id}>{displayText}</Text>
-                );
-              })}
+            {socialMedia && socialMedia.length > 0 && (
+              <View style={tw("flex flex-row flex-wrap justify-center gap-x-3")}>
+                {socialMedia.map((social) => {
+                  if (!social.platform && !social.url) return null;
+                  const displayText = social.platform || social.url;
+                  const isValidUrl = social.url.length > 0;
+                  const formattedUrl = social.url.startsWith("http")
+                    ? social.url
+                    : `https://${social.url}`;
+
+                  return isValidUrl ? (
+                    <Link
+                      key={social.id}
+                      src={formattedUrl}
+                      style={tw("text-blue-600 underline")}
+                    >
+                      {displayText}
+                    </Link>
+                  ) : (
+                    <Text key={social.id}>{displayText}</Text>
+                  );
+                })}
+              </View>
+            )}
           </View>
         </View>
+
+        {/* Professional Summary Section */}
+        {visibility.summary && summary?.content && (
+          <View style={tw("mb-4")} wrap={false}>
+            <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
+              {summary.title || "Professional Summary"}
+            </Text>
+            <Text>{summary.content}</Text>
+          </View>
+        )}
 
         {/* Education Section */}
         {visibility.education && education.length > 0 && (
@@ -91,7 +114,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             </Text>
 
             {education.map((edu) => (
-              <View key={edu.id} style={tw("mb-2")}>
+              <View key={edu.id} style={tw("mb-2")} wrap={false}>
                 <View style={tw("flex flex-row justify-between items-baseline mb-0.5")}>
                   <Text style={tw("font-bold")}>{edu.school}</Text>
                   <Text>
@@ -116,7 +139,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             </Text>
 
             {experience.map((exp) => (
-              <View key={exp.id} style={tw("mb-3")}>
+              <View key={exp.id} style={tw("mb-3")} wrap={false}>
                 <View style={tw("flex flex-row justify-between items-baseline mb-0.5")}>
                   <Text style={tw("font-bold")}>{exp.position}</Text>
                   <Text>
@@ -149,7 +172,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             </Text>
 
             {leadership.map((item) => (
-              <View key={item.id} style={tw("mb-3")}>
+              <View key={item.id} style={tw("mb-3")} wrap={false}>
                 <View style={tw("flex flex-row justify-between items-baseline mb-0.5")}>
                   <Text style={tw("font-bold")}>{item.position}</Text>
                   <Text>
@@ -181,7 +204,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
               Volunteer & Community Service
             </Text>
             {volunteer.map((vol) => (
-              <View key={vol.id} style={tw("mb-3")}>
+              <View key={vol.id} style={tw("mb-3")} wrap={false}>
                 <View style={tw("flex flex-row justify-between items-baseline mb-0.5")}>
                   <Text style={tw("font-bold")}>{vol.position}</Text>
                   <Text>
@@ -206,7 +229,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
 
         {/* Skills Section */}
         {visibility.skills && skills && skills.length > 0 && (
-          <View style={tw("mb-4")}>
+          <View style={tw("mb-4")} wrap={false}>
             <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               Skills
             </Text>
@@ -224,7 +247,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
             </Text>
 
             {projects.map((project) => (
-              <View key={project.id} style={tw("mb-3")}>
+              <View key={project.id} style={tw("mb-3")} wrap={false}>
                 <View style={tw("flex flex-row items-baseline mb-1")}>
                   <Text style={tw("font-bold mr-1")}>{project.name}</Text>
                   {project.link && (
@@ -255,7 +278,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
 
         {/* Portfolio Section */}
         {visibility.portfolio && portfolio && portfolio.length > 0 && (
-          <View style={tw("mb-4")}>
+          <View style={tw("mb-4")} wrap={false}>
             <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               Portfolio & Profiles
             </Text>
@@ -291,7 +314,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
               Certifications
             </Text>
             {certifications.map((cert) => (
-              <View key={cert.id} style={tw("mb-2")}>
+              <View key={cert.id} style={tw("mb-2")} wrap={false}>
                 <View style={tw("flex flex-row justify-between items-baseline mb-0.5")}>
                   <Text style={tw("font-bold")}>{cert.name}</Text>
                   <Text>{cert.date}</Text>
@@ -316,7 +339,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
               Awards & Achievements
             </Text>
             {awards.map((award) => (
-              <View key={award.id} style={tw("mb-2")}>
+              <View key={award.id} style={tw("mb-2")} wrap={false}>
                 <View style={tw("flex flex-row justify-between items-baseline mb-0.5")}>
                   <Text style={tw("font-bold")}>{award.name}</Text>
                   <Text>{award.date}</Text>
@@ -328,7 +351,7 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
         )}
 
         {/* Languages & Hobbies Row */}
-        <View style={tw("flex flex-row gap-8 mb-4")}>
+        <View style={tw("flex flex-row gap-8 mb-4")} wrap={false}>
           {visibility.languages && languages && languages.length > 0 && (
             <View style={tw("flex-1")}>
               <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
@@ -354,12 +377,25 @@ export function ResumeDocument({ data }: ResumeDocumentProps) {
 
         {/* References Section */}
         {visibility.references && (
-          <View style={tw("mb-4")}>
+          <View style={tw("mb-4")} wrap={false}>
             <Text style={tw("font-bold uppercase border-b border-black pb-1 mb-2")}>
               References
             </Text>
             <Text>{references}</Text>
           </View>
+        )}
+
+        {/* Footer Section - Absolute positioned to the bottom */}
+        {visibility.footer && footer && (
+          <Text
+            fixed
+            style={[
+              tw("text-center font-bold"),
+              { position: "absolute", bottom: 24, left: 0, right: 0, fontSize: 12 },
+            ]}
+          >
+            {footer}
+          </Text>
         )}
       </Page>
     </Document>
