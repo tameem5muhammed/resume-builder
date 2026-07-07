@@ -6,6 +6,14 @@ import { getResumes, deleteResume, toggleResumePrivacy } from "@/app/actions/res
 import { CreateResumeButton } from "@/app/components/organisms/CreateResumeButton";
 import { CopyLinkButton } from "@/app/components/organisms/CopyLinkButton";
 
+// 1. Define the exact shape of the data coming from the database
+type DashboardResume = {
+  id: string;
+  title: string;
+  updatedAt: Date;
+  isPublic: boolean;
+};
+
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
@@ -35,7 +43,8 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {resumes.map((resume) => (
+            {/* 2. Explicitly type the resume parameter here */}
+            {resumes.map((resume: DashboardResume) => (
               <div key={resume.id} className="bg-gray-900 border border-gray-800 rounded-lg p-6 shadow-lg flex flex-col relative overflow-hidden">
                 
                 {/* Privacy Badge / Toggle */}
