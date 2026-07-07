@@ -3,11 +3,13 @@
 import { prisma } from "@/app/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 // 1. Save or Update a Resume
 export async function saveResume(title: string, content: any, resumeId?: string) {
   try {
-    const session = await getServerSession();
+    // Pass authOptions to ensure session reads correctly
+    const session = await getServerSession(authOptions);
     
     if (!session || !session.user?.email) {
       return { success: false, error: "Must be logged in to save to cloud." };
@@ -25,6 +27,20 @@ export async function saveResume(title: string, content: any, resumeId?: string)
     let savedResume;
 
     if (resumeId) {
+      // --- SECURITY PATCH: Check Ownership before updating ---
+      const existingResume = await prisma.resume.findUnique({
+        where: { id: resumeId }
+      });
+
+      if (!existingResume) {
+        return { success: false, error: "Resume not found." };
+      }
+
+      if (existingResume.userId !== user.id) {
+        return { success: false, error: "Unauthorized: You do not own this resume." };
+      }
+      // -------------------------------------------------------
+
       // Update existing resume
       savedResume = await prisma.resume.update({
         where: { id: resumeId },
@@ -55,7 +71,7 @@ export async function saveResume(title: string, content: any, resumeId?: string)
 // 2. Fetch all Resumes for the Dashboard
 export async function getResumes() {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session || !session.user?.email) return [];
 
     const user = await prisma.user.findUnique({
@@ -67,7 +83,8 @@ export async function getResumes() {
     const resumes = await prisma.resume.findMany({
       where: { userId: user.id },
       orderBy: { updatedAt: 'desc' },
-      select: { id: true, title: true, updatedAt: true } // Don't fetch the massive content JSON just for the list
+      // Added isPublic here so the dashboard can render the toggle correctly!
+      select: { id: true, title: true, updatedAt: true, isPublic: true } 
     });
     return resumes;
   } catch (error) {
@@ -79,8 +96,18 @@ export async function getResumes() {
 // 3. Delete a Resume
 export async function deleteResume(id: string) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session || !session.user?.email) return { success: false };
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email }
+    });
+
+    if (!user) return { success: false };
+
+    // Extra security: Only allow deletion if the user actually owns it
+    const existing = await prisma.resume.findUnique({ where: { id } });
+    if (existing?.userId !== user.id) return { success: false };
 
     await prisma.resume.delete({
       where: { id },
@@ -101,5 +128,31 @@ export async function getResumeById(id: string) {
     return resume;
   } catch (error) {
     return null;
+  }
+}
+
+// 5. Toggle Privacy Status
+export async function toggleResumePrivacy(id: string, isPublic: boolean) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) return { success: false, error: "Unauthorized" };
+
+    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+    if (!user) return { success: false, error: "User not found" };
+
+    // Verify ownership before updating
+    const existing = await prisma.resume.findUnique({ where: { id } });
+    if (existing?.userId !== user.id) return { success: false, error: "Unauthorized" };
+
+    await prisma.resume.update({
+      where: { id },
+      data: { isPublic },
+    });
+    
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to toggle privacy:", error);
+    return { success: false, error: "Failed to update" };
   }
 }

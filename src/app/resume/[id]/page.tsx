@@ -1,16 +1,45 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getResumeById } from "@/app/actions/resumeActions";
 import { PublicDownloadPanel } from "@/app/components/organisms/PublicDownloadPanel";
 import { ResumeData } from "@/app/store/useResumeStore";
 
 export default async function PublicResumePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
-  const resume = await getResumeById(resolvedParams.id);
+  
+  // Fetch session and resume in parallel for speed
+  const [session, resume] = await Promise.all([
+    getServerSession(authOptions),
+    getResumeById(resolvedParams.id)
+  ]);
 
   if (!resume || !resume.content) {
     notFound();
   }
+
+  // --- PRIVACY CHECK ---
+  // @ts-ignore - NextAuth types don't include 'id' on user by default
+  const isOwner = session?.user?.id === resume.userId;
+
+  if (!resume.isPublic && !isOwner) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="text-6xl mb-6">🔒</div>
+          <h1 className="text-3xl font-extrabold text-slate-900 mb-2">This Resume is Private</h1>
+          <p className="text-slate-500 mb-8">
+            The owner has set this resume to private. If this is your resume, please log in to view it.
+          </p>
+          <Link href="/login" className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors shadow-sm">
+            Log In to View
+          </Link>
+        </div>
+      </div>
+    );
+  }
+  // ---------------------
 
   const data = (typeof resume.content === "string" ? JSON.parse(resume.content) : resume.content) as ResumeData;
   

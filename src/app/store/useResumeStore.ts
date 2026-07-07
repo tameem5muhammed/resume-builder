@@ -97,16 +97,42 @@ export interface Summary {
   content: string;
 }
 
+// 1. Extract the default empty state into a constant
+const defaultResumeData: ResumeData = {
+  personalInfo: { name: "", title: "", email: "", phone: "", website: "", address: "" },
+  summary: { title: "Professional Summary", content: "" },
+  education: [],
+  experience: [],
+  skills: [],
+  projects: [],
+  leadership: [],
+  volunteer: [],
+  certifications: [],
+  awards: [],
+  hobbies: [],
+  languages: [],
+  portfolio: [],
+  socialMedia: [],
+  references: "Available upon request.",
+  footer: "",
+  visibility: {
+    summary: true, education: true, experience: true, leadership: true,
+    volunteer: true, projects: true, portfolio: true, skills: true,
+    certifications: true, awards: true, languages: true, hobbies: true,
+    footer: true, references: true,
+  },
+};
+
 interface ResumeStore {
   data: ResumeData;
   currentResumeId: string | null;
   setCurrentResumeId: (id: string | null) => void;
   loadFullResume: (resumeId: string, fullData: ResumeData) => void;
+  resetResume: () => void; // 2. Add the reset action here
   updatePersonalInfo: (info: Partial<ResumeData["personalInfo"]>) => void;
   addEducation: (edu: Education) => void;
   updateEducation: (id: string, updatedEdu: Partial<Education>) => void;
   removeEducation: (id: string) => void;
-
   addExperience: (exp: Experience) => void;
   updateExperience: (id: string, updatedExp: Partial<Experience>) => void;
   removeExperience: (id: string) => void;
@@ -117,25 +143,10 @@ interface ResumeStore {
   removeProject: (id: string) => void;
   updateSummary: (summary: { title: string; content: string }) => void;
   updateFooter: (text: string) => void;
-
   updateList: <
-    K extends
-      | "leadership"
-      | "volunteer"
-      | "certifications"
-      | "awards"
-      | "portfolio"
-      | "socialMedia",
-  >(
-    key: K,
-    items: ResumeData[K],
-  ) => void;
-
-  updateTags: <K extends "hobbies" | "languages">(
-    key: K,
-    items: ResumeData[K],
-  ) => void;
-
+    K extends "leadership" | "volunteer" | "certifications" | "awards" | "portfolio" | "socialMedia"
+  >(key: K, items: ResumeData[K]) => void;
+  updateTags: <K extends "hobbies" | "languages">(key: K, items: ResumeData[K]) => void;
   updateReferences: (text: string) => void;
   toggleVisibility: (section: keyof VisibilitySettings) => void;
 }
@@ -143,49 +154,7 @@ interface ResumeStore {
 export const useResumeStore = create<ResumeStore>()(
   persist(
     (set) => ({
-      data: {
-        personalInfo: {
-          name: "",
-          title: "",
-          email: "",
-          phone: "",
-          website: "",
-          address: "",
-        },
-        summary: { title: "Professional Summary", content: "" }, // Default summary
-        education: [],
-        experience: [],
-        skills: [],
-        projects: [],
-        leadership: [],
-        volunteer: [],
-        certifications: [],
-        awards: [],
-        hobbies: [],
-        languages: [],
-        portfolio: [],
-        socialMedia: [],
-        references: "Available upon request.",
-        footer: "",
-
-        visibility: {
-          summary: true,
-          education: true,
-          experience: true,
-          leadership: true,
-          volunteer: true,
-          projects: true,
-          portfolio: true,
-          skills: true,
-          certifications: true,
-          awards: true,
-          languages: true,
-          hobbies: true,
-          footer: true,
-          references: true,
-        },
-      },
-
+      data: defaultResumeData, // Use the constant here
       currentResumeId: null,
 
       setCurrentResumeId: (id) => set({ currentResumeId: id }),
@@ -194,6 +163,13 @@ export const useResumeStore = create<ResumeStore>()(
         set({
           currentResumeId: resumeId,
           data: fullData,
+        }),
+
+      // 3. Implement the reset function
+      resetResume: () =>
+        set({
+          currentResumeId: null,
+          data: defaultResumeData,
         }),
 
       updatePersonalInfo: (info) =>
@@ -317,8 +293,8 @@ export const useResumeStore = create<ResumeStore>()(
         })),
     }),
     {
-      name: "resume-storage", // name of the item in local storage
-      partialize: (state) => ({ data: state.data }), // Only save the resume data, not the ID
+      name: "resume-storage",
+      partialize: (state) => ({ data: state.data }),
     }
   )
 );

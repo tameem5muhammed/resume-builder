@@ -26,6 +26,7 @@ import { getResumeById } from "@/app/actions/resumeActions";
 import { useResumeStore } from "@/app/store/useResumeStore";
 import { SummaryForm } from "@/app/components/organisms/SummaryForm";
 import { FooterForm } from "@/app/components/organisms/FooterForm";
+import { UserMenu } from "@/app/components/organisms/UserMenu";
 
 const ResumePreview = dynamic(
   () => import("@/app/components/organisms/ResumePreview"),
@@ -82,25 +83,34 @@ export default function Home({
     <BuilderLayout
       forms={
         <>
-          <div className="flex justify-between items-center mb-8 bg-gray-900 p-4 rounded-lg shadow-sm border border-gray-800 sticky top-0 z-10">
+          {/* SINGLE CLEAN HEADER */}
+          <div className="flex flex-col md:flex-row justify-between items-center mb-8 bg-gray-900 p-4 rounded-lg shadow-md border border-gray-800 sticky top-0 z-10 gap-4">
+            
+            {/* Left Side: Title and Links */}
             <div className="flex items-center gap-4">
               <h1 className="text-2xl md:text-3xl font-extrabold text-white">
                 Resume Builder
               </h1>
-              {/* Dashboard Navigation Link */}
-              <Link href="/dashboard" className="text-blue-400 hover:text-blue-300 text-sm font-medium">
+              <Link
+                href="/dashboard"
+                className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors"
+              >
                 View My Resumes
               </Link>
             </div>
 
-            <div className="flex items-center gap-4">
+            {/* Right Side: Auth and Actions */}
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <UserMenu />
+              <div className="hidden sm:block w-px h-6 bg-gray-700 mx-1"></div> {/* Subtle Divider */}
               <SaveButton />
               <DownloadButton />
             </div>
+
           </div>
 
+          {/* Form Sections */}
           <SectionToggles />
-
           <PersonalInfoForm />
           <SummaryForm />
           <SocialMediaForm />

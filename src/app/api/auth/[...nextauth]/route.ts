@@ -2,34 +2,58 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/app/lib/prisma";
 import GoogleProvider from "next-auth/providers/google";
-import GithubProvider from "next-auth/providers/github";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
-  // 1. Connect NextAuth to your Postgres database using Prisma
   adapter: PrismaAdapter(prisma),
-  
-  // 2. Configure one or more authentication providers
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
-    GithubProvider({
-      clientId: process.env.GITHUB_ID as string,
-      clientSecret: process.env.GITHUB_SECRET as string,
-    }),
-  ],
+    CredentialsProvider({
+      name: "Email and Password",
+      credentials: {
+        email: { label: "Email", type: "email", placeholder: "jane@example.com" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Invalid credentials");
+        }
 
-  // 3. Configure session settings
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email }
+        });
+
+        if (!user || !user.password) {
+          throw new Error("User not found or uses Google sign-in");
+        }
+
+        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+
+        if (!isPasswordValid) {
+          throw new Error("Invalid password");
+        }
+
+        return user;
+      }
+    })
+  ],
+  
+  // ADDED: Tell NextAuth to use our custom login page
+  pages: {
+    signIn: '/login',
+  },
+
   session: {
     strategy: "jwt",
   },
-
-  // 4. Inject the user ID from the database into the session so we can use it in our actions
   callbacks: {
     async session({ session, token }) {
       if (session.user && token.sub) {
-        // @ts-ignore - NextAuth types don't include 'id' on user by default
+        // @ts-ignore
         session.user.id = token.sub; 
       }
       return session;
@@ -38,6 +62,4 @@ export const authOptions: NextAuthOptions = {
 };
 
 const handler = NextAuth(authOptions);
-
-// Export the handler for both GET and POST requests (required by App Router)
 export { handler as GET, handler as POST };
